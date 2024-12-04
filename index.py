@@ -43,7 +43,6 @@ def notes_status_creator(task_to_upd: str):
                     return (3, "high")
         else:
             print("Invalid value")
-            return False
     elif task_to_upd == "Status":
         new_value_status = int(input("Enter new status: 1 - new, 2 - in-progress, 3 - done: "))
         if new_value_status in [1, 2, 3]:
@@ -56,10 +55,8 @@ def notes_status_creator(task_to_upd: str):
                     return (3, "done")
         else:
             print("Invalid value")
-            return False
 
 def notes_creator():    
-    task = {}
     note_name = input("Name: ")
     note_description = input("Description: ")
     note_priority = notes_status_creator("Priority")
@@ -71,13 +68,13 @@ def notes_creator():
         return
     note_id = id_generator()
     id_storage.append(note_id)
-    task.update({
+    task = {
         "ID": note_id,
         "Name": note_name,
         "Description": note_description,
         "Priority": note_priority,
         "Status": note_status
-    })
+    }
     notes_storage.append(task)
 
 def file_changer(notes: list):
@@ -98,17 +95,16 @@ def notes_priority_sorter():
         print(task)
         
 def notes_remover():
-    rem_task_id = str(input("Enter the ID of the task you want to remove: ")).strip()
-    task_to_remove = None
-    for task in notes_storage:
-        if task["ID"] == rem_task_id:
-            task_to_remove = task
-            break
+    rem_task_id = input("Enter the ID of the task you want to remove: ").strip()
+
+    task_to_remove = next((task for task in notes_storage if task["ID"] == rem_task_id), None)
+
     if task_to_remove:
-        print(f"Found task: {task_to_remove}")
         notes_storage.remove(task_to_remove)
         file_changer(notes_storage)
-        print("Task has been succesfully deleted")
+        print("Task has been successfully deleted.")
+    else:
+        print("Task not found!")
             
     
 def notes_updater():
