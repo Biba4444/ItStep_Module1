@@ -1,52 +1,34 @@
-ID_STORAGE = []
+id_storage = []
 notes_storage = []
 
 def file_reader(isID=False):
+    def parse_block(block):
+        return {
+            key.strip(): value.strip()
+            for line in block.split("\n")
+            if ":" in line
+            for key, value in [line.split(":", 1)]
+        }
+
+    with open("Notes.txt", "r") as file:
+        data = file.read().strip()
+
+    blocks = data.split("\n\n")
+    records = [parse_block(block) for block in blocks]
+
     if isID:
-        with open("Notes.txt", "r") as file:
-            data = file.read().strip()
-            blocks = data.split("\n\n")
-            result = []
+        return [str(record["ID"]) for record in records if "ID" in record]
 
-            for block in blocks:
-                record = {}
-                lines = block.split("\n")
+    return records
 
-                for line in lines:
-                    if ":" in line:
-                        key, value = line.split(":", 1)
-                        record[key.strip()] = value.strip()
 
-                result.append(int(record["ID"]))
-
-            return result
-    else:
-        with open("Notes.txt", "r") as file:
-            data = file.read().strip()
-            blocks = data.split("\n\n")
-            result = []
-            
-            for block in blocks:
-                record = {}
-                lines = block.split("\n")
-                
-                for line in lines:
-                    if ":" in line:
-                        key, value = line.split(":", 1)
-                        record[key.strip()] = value.strip()
-                        
-                result.append(record)
-                
-            return result
-    
 notes_storage = file_reader()
-ID_STORAGE = file_reader(True)
+id_storage = file_reader(True)
 
 def id_generator() -> int:
-    new_id = 1
-    while new_id in ID_STORAGE:
-        new_id += 1
-    return new_id
+    max_numeric_storage = list(map(int, id_storage))
+    max_id = max(max_numeric_storage) if max_numeric_storage else 0
+    return max_id + 1
 
 def notes_status_creator(task_to_upd: str):
     if task_to_upd == "Priority":    
@@ -88,7 +70,7 @@ def notes_creator():
     if note_status is False:
         return
     note_id = id_generator()
-    ID_STORAGE.append(note_id)
+    id_storage.append(note_id)
     task.update({
         "ID": note_id,
         "Name": note_name,
